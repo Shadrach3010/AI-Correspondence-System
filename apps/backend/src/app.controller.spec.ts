@@ -15,8 +15,14 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return ICMS system metadata', () => {
+      const result = appController.getAppInfo();
+
+      expect(result).toMatchObject({
+        name: 'ICMS',
+        status: 'ready',
+        module: 'core',
+      });
     });
   });
 });

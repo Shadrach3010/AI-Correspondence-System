@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Institution {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  code        String      @unique
+  active      Boolean     @default(true)
+  departments Department[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions Json?
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Department {
+  id            String      @id @default(cuid())
+  name          String      @unique
+  code          String      @unique
+  parentId      String?
+  institutionId String?
+  active        Boolean     @default(true)
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  users         User[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  password     String
+  status       UserStatus  @default(ACTIVE)
+  roleId       String?
+  departmentId String?
+  role         Role?       @relation(fields: [roleId], references: [id])
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model IncomingItem {
+  id        String   @id @default(cuid())
+  source    String
+  subject   String
+  sender    String
+  body      String?
+  status    String   @default("RECEIVED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Assignment {
+  id               String   @id @default(cuid())
+  correspondenceId String
+  assigneeId       String
+  status           String   @default("PENDING")
+  priority         String   @default("MEDIUM")
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
